@@ -1,0 +1,13 @@
+﻿# YOLO26n detector - box stage of the pipeline
+model: yolo26n.pt
+imgsz: 640
+batch: 16
+epochs: 60
+optimizer: AdamW
+lr0: 0.001
+weight_decay: 0.0005
+patience: 15
+cls_pw: 0.5
+cos_lr: true
+workers: 4
+seed: 42

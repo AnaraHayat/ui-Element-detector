@@ -82,7 +82,11 @@ class AttentionModule(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         trunk = self.trunk(x)
-        return (1.0 + self.mask(trunk)) * trunk
+        mask = self.mask(trunk)
+        # the encoder/decoder can drift by a pixel on odd feature sizes; force alignment
+        if mask.shape[-2:] != trunk.shape[-2:]:
+            mask = nn.functional.interpolate(mask, size=trunk.shape[-2:], mode="nearest")
+        return (1.0 + mask) * trunk
 
 
 class AttentionRefinement(nn.Module):

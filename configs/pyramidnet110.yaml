@@ -1,0 +1,15 @@
+﻿# PyramidNet-110 (alpha=48) - no pretrained weights, 1.77 M params, needs more epochs
+model: pyramidnet110
+img_size: 128
+batch_size: 128
+epochs: 60
+lr: 0.001
+weight_decay: 0.0001
+label_smoothing: 0.05
+patience: 10
+max_crops: 300000
+val_per_class: 1500
+num_workers: 4
+pretrained: false
+weight_power: 1.0
+seed: 42
