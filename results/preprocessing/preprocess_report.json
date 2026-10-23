@@ -1,0 +1,36 @@
+{
+  "images_scanned": 66261,
+  "images_kept": 66041,
+  "images_skipped": {
+    "no_boxes": 220
+  },
+  "boxes_written": 1915620,
+  "boxes_dropped": {
+    "structural": 506060,
+    "zero_size": 2089598,
+    "Other": 588021,
+    "negative_size": 1226010,
+    "Input": 27527,
+    "Spinner": 8836,
+    "SeekBar": 6465,
+    "Dialog": 1952,
+    "VideoView": 1300
+  },
+  "class_counts": {
+    "Layout": 993162,
+    "Text": 412781,
+    "Image": 213601,
+    "Button": 78649,
+    "Toolbar": 61263,
+    "ProgressBar": 13494,
+    "List": 36054,
+    "WebView": 7718,
+    "Tab": 15467,
+    "Drawer": 19522,
+    "Ad": 11660,
+    "Card": 12910,
+    "ScrollView": 19996,
+    "Checkbox": 3901,
+    "ViewPager": 15442
+  }
+}

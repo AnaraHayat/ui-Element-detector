@@ -1,5 +1,6 @@
 data/raw/
 data/processed/
+data/yolo/
 results/*/checkpoints/
 __pycache__/
 venv/

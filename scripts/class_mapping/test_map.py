@@ -1,4 +1,4 @@
-"""Sanity checks for class_map.py. Run: python scripts/dataset/test_map.py"""
+"""Sanity checks for class_map.py. Run: python scripts/class_mapping/test_map.py"""
 
 from __future__ import annotations
 

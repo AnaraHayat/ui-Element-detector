@@ -4,7 +4,7 @@ Reads results/preprocessing/raw_class_counts.csv (output of scan_raw_classes.py)
 so the 6.6k JSON files do not need to be parsed again.
 
 Usage:
-    python scripts/dataset/count_mapped_classes.py
+    python scripts/class_mapping/count_mapped_classes.py
 """
 
 from __future__ import annotations
@@ -20,8 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from class_map import CLASSES, map_label  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_IN = PROJECT_ROOT / "results" / "preprocessing" / "raw_class_counts.csv"
-DEFAULT_OUT = PROJECT_ROOT / "results" / "preprocessing" / "mapped_class_counts.csv"
+DEFAULT_IN = PROJECT_ROOT / "results" / "class_mapping" / "raw_class_counts.csv"
+DEFAULT_OUT = PROJECT_ROOT / "results" / "class_mapping" / "mapped_class_counts.csv"
 
 
 def main() -> None:

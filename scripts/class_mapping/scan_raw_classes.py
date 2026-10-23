@@ -4,8 +4,8 @@ Reads all view hierarchies, walks the node tree and writes a CSV with, per raw
 class: how many nodes use it and in how many screenshots it appears.
 
 Usage:
-    python scripts/dataset/scan_raw_classes.py
-    python scripts/dataset/scan_raw_classes.py --json-dir data/raw/rico/unique_uis/combined
+    python scripts/class_mapping/scan_raw_classes.py
+    python scripts/class_mapping/scan_raw_classes.py --json-dir data/raw/rico/unique_uis/combined
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from tqdm import tqdm
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_JSON_DIR = PROJECT_ROOT / "data" / "raw" / "rico" / "unique_uis" / "combined"
-DEFAULT_OUT = PROJECT_ROOT / "results" / "preprocessing" / "raw_class_counts.csv"
+DEFAULT_OUT = PROJECT_ROOT / "results" / "class_mapping" / "raw_class_counts.csv"
 
 
 def walk(node: dict | None, node_counts: Counter, seen: set[str]) -> None:
