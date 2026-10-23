@@ -19,6 +19,6 @@ You are helping build a deep learning semester project in opencode. All project 
 - Keep answers short and plain.
 
 ## Key facts
-- Dataset: RICO. Task: classify cropped UI elements into 15 classes, compare 5–7 CNN transfer-learning models published after 2022.
+- Dataset: RICO. Task: object detection on full screenshots (class + bounding box, YOLO format), 15 classes. Models to compare (5–7, user's list): DenseNet, Xception, PyramidNet, Residual Attention Network, SENet, latest YOLO. The "published after 2022" filter was dropped by the user.
 - No image generation of any kind (no synthetic or copy-paste images).
 - Pipeline: Preprocessing → Split 70:20:10 (train:test:validate) → Training → Testing → Evaluation.
