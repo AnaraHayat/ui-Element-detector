@@ -1,0 +1,22 @@
+{
+  "seed": 42,
+  "ratios": {
+    "train": 0.7,
+    "test": 0.2,
+    "val": 0.1
+  },
+  "source_images": 66041,
+  "images": {
+    "train": 46228,
+    "test": 13208,
+    "val": 6605
+  },
+  "boxes": {
+    "train": 1339701,
+    "test": 383955,
+    "val": 191964
+  },
+  "link_modes": {
+    "hardlink": 66041
+  }
+}
