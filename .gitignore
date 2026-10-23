@@ -1,0 +1,9 @@
+data/raw/
+data/processed/
+results/*/checkpoints/
+__pycache__/
+venv/
+.env
+*.pt
+*.pth
+docs/
