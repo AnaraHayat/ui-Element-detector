@@ -12,7 +12,7 @@ You are helping build a deep learning semester project in opencode. All project 
 ## How to work
 - Do only the current phase from `docs/memory.md`. Do one step at a time.
 - Before coding, say in 2–3 lines what you will do. After coding, run it and show the result.
-- After each finished step, update `docs/memory.md` (done, decisions, next).
+- After each finished step, update `docs/memory.md` (done, decisions, next) **and** `README.md` (what was done in that step, with numbers and commands).
 - Use existing packages. Do not rebuild what a library already does.
 - If something is unclear or conflicts with the docs, ask. Do not guess.
 - Never delete or overwrite anything in `data/` or `results/` without asking.
