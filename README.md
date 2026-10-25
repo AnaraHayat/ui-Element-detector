@@ -183,11 +183,13 @@ python scripts/training/train_cnn.py --model densenet121 --epochs 1 --max-crops 
 
 **Real training (Colab, T4):**
 
-1. Upload `ui-data.zip` (≈7.8 GB, archive root is `yolo/`) to Drive root. The notebook
-   extracts it into `data/`, producing `data/yolo/...`.
-2. Open `notebooks/colab_train.ipynb`, set `ZIP_PATH`, run the cells in order.
-3. The notebook checks the dataset, runs a smoke test, then trains the 5 classifiers
-   and YOLO26n, and packages `results/` back to Drive.
+```bash
+python scripts/run_all_colab.py --data-zip /content/drive/MyDrive/ui-data.zip --zip-out /content/drive/MyDrive/ui-results.zip
+```
+
+or open `notebooks/colab_train.ipynb` and run the cells in order (it does the same thing
+step by step). Useful flags: `--models densenet121 xception41` (subset), `--skip-smoke`,
+`--no-yolo`, `--smoke-only`, `--epochs`, `--batch-size`.
 
 **Rebuild everything from raw RICO:**
 
