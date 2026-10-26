@@ -200,6 +200,19 @@ python scripts/training/train_cnn.py --model densenet121 --epochs 1 --max-crops 
     --val-per-class 20 --batch-size 16 --no-pretrained --out-suffix _smoke
 ```
 
+**Real training (Kaggle, T4/P100):**
+
+1. Kaggle → *Datasets* → *New Dataset* → upload `ui-data.zip` → title `ui-data`. Do not extract it.
+2. Open `notebooks/kaggle_train.ipynb` → *Session options*: **Accelerator = GPU T4 x2**, **Internet = On**; *Add Input* → your `ui-data` dataset.
+3. Run the cells top to bottom. The notebook clones the repo, unpacks the zip into
+   `/kaggle/working/project/data`, fixes `data.yaml`, smoke-tests, trains the 5
+   classifiers, trains YOLO26n, and writes `ui-results.zip` to `/kaggle/working`.
+4. **Save Version** at the end, then download `ui-results.zip` from the *Output* tab.
+
+Session limits: 12 h per session and 30 h GPU per week, so split the models over 2–3
+sessions — each checkpoint is copied to `/kaggle/working/saved` and the loop skips any
+model that is already there.
+
 **Real training (Colab, T4):**
 
 1. Upload `ui-data.zip` (≈7.8 GB, archive root is `yolo/`) to Drive root. The notebook
@@ -207,6 +220,10 @@ python scripts/training/train_cnn.py --model densenet121 --epochs 1 --max-crops 
 2. Open `notebooks/colab_train.ipynb`, set `ZIP_PATH`, run the cells in order.
 3. The notebook checks the dataset, runs a smoke test, then trains the 5 classifiers
    and YOLO26n, and packages `results/` back to Drive.
+
+Both notebooks run the same cell that strips the absolute `path:` line from
+`data.yaml`, so the dataset works on any machine (the file must be resolved relative to
+itself, not to `D:/python/...`).
 
 **Rebuild everything from raw RICO:**
 
