@@ -213,6 +213,18 @@ python scripts/training/train_cnn.py --model densenet121 --epochs 1 --max-crops 
    `ui-results.zip` to `/kaggle/working`.
 5. **Save Version**, then download `ui-results.zip` from the *Output* tab.
 
+`/kaggle/working` is **temporary**: checkpoints in `/kaggle/working/saved` disappear when the
+session ends (12 h cap, or ~20 min idle). Keep them with either:
+
+* *Settings → Persistence → **Files only*** — `/kaggle/working` is restored in the next
+  session; or
+* *Save Version → Quick Save* after each model; next time use *Add Input → Your work →
+  Notebook output*, and the training cell copies `models_*_best.pt` back into `saved/`
+  automatically, so finished models are skipped.
+
+Closing the laptop does not stop a cell that is already running (the kernel keeps going),
+but it does not protect the files either if the session ends.
+
 Session limits: 12 h per session and 30 h GPU per week, so split the models over 2–3
 sessions — each checkpoint is copied to `/kaggle/working/saved` and the loop skips any
 model that is already there.
