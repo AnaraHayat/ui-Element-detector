@@ -1,0 +1,92 @@
+{
+  "Layout": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Text": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Image": {
+    "precision": 0.02040816326530612,
+    "recall": 0.05,
+    "f1": 0.028985507246376812,
+    "support": 20
+  },
+  "Button": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Toolbar": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "ProgressBar": {
+    "precision": 0.3333333333333333,
+    "recall": 0.05,
+    "f1": 0.08695652173913043,
+    "support": 20
+  },
+  "List": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "WebView": {
+    "precision": 0.1,
+    "recall": 1.0,
+    "f1": 0.18181818181818182,
+    "support": 20
+  },
+  "Tab": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Drawer": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Ad": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Card": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "ScrollView": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  },
+  "Checkbox": {
+    "precision": 0.1111111111111111,
+    "recall": 0.25,
+    "f1": 0.15384615384615385,
+    "support": 20
+  },
+  "ViewPager": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "support": 20
+  }
+}

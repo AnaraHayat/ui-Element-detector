@@ -166,6 +166,25 @@ code runs. RAN needed a fix for odd feature-map sizes, and PyramidNet was initia
 2.3 B parameters because of a wrong channel-growth rule (paper: width grows from 16 to
 16+alpha across the network).
 
+#### Training speed (measured, after the first Colab run was too slow)
+
+Profiling showed the GPU was idle waiting on JPEG decoding, not computing: opening a
+1080x1920 screenshot costs **37 ms**, so 300,000 crops meant about **3 hours of pure
+decoding per epoch**.
+
+Four changes, all measured on this machine:
+
+| change | effect |
+|---|---|
+| half-resolution JPEG decode (`img.draft`) when the box is >= 1.5x the input | 37 ms -> **5 ms per crop (7x)**; the model still receives >= 96 px before resize, small boxes keep full resolution |
+| crops per epoch 300,000 -> **60,000** | epoch time / 5 |
+| epochs 40/60 -> **20** (pretrained) and **25** (from scratch) | total time / 2-3 |
+| `persistent_workers`, `prefetch_factor=4`, `cudnn.benchmark` | hides loader stalls, picks faster kernels |
+
+Configs now train 60,000 crops per epoch — 1.2 M samples over 20 epochs, i.e. roughly one
+full pass over the 1.34 M training boxes. Expected on a T4: **~6-8 min per epoch**,
+2-3 h per classifier, ~2.5 h for YOLO26n.
+
 Known limitation: Ultralytics has no per-class weights (only a scalar `cls_pw`), so
 class weighting applies to the classifier stage.
 

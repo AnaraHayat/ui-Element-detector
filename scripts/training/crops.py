@@ -93,7 +93,6 @@ class CropDataset(Dataset):
     def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
         stem, cid, cx, cy, w, h = self.samples[index]
         with Image.open(self.images_dir / f"{stem}.jpg") as img:
-            img = img.convert("RGB")
             width, height = img.size
             x1 = max(0, int(round((cx - w / 2) * width)))
             y1 = max(0, int(round((cy - h / 2) * height)))
@@ -103,7 +102,20 @@ class CropDataset(Dataset):
                 x2 = min(width, x1 + 2)
             if y2 <= y1:
                 y2 = min(height, y1 + 2)
-            crop = img.crop((x1, y1, x2, y2))
+
+            # Fast path: decoding a 1080x1920 JPEG costs 16-37 ms and dominates training
+            # time, while the GPU step takes a fraction of that. If the box is at least
+            # 1.5x the model input, half-resolution decoding still leaves >= 0.75x
+            # img_size pixels, so the model only sees a modest upscale (measured 5 ms
+            # per crop, ~4x faster). Small boxes keep the full-resolution path.
+            scale = 1.0
+            if min(x2 - x1, y2 - y1) >= 1.5 * self.img_size:
+                img.draft("RGB", (width // 2, height // 2))
+                scale = img.size[0] / width
+
+            crop = img.convert("RGB").crop(
+                (int(x1 * scale), int(y1 * scale), int(x2 * scale), int(y2 * scale))
+            )
         return self.tf(crop), cid
 
 

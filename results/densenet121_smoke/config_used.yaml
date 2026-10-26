@@ -1,0 +1,14 @@
+batch_size: 16
+epochs: 1
+img_size: 128
+label_smoothing: 0.05
+lr: 0.0005
+max_crops: 300
+model: densenet121
+num_workers: 0
+patience: 6
+pretrained: false
+seed: 42
+val_per_class: 20
+weight_decay: 0.0005
+weight_power: 1.0

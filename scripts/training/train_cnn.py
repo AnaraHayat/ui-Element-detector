@@ -129,6 +129,9 @@ def main() -> None:
         if override is not None:
             cfg[key] = override
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    if device.type == "cuda":
+        # fixed input size -> let cuDNN pick its fastest kernels
+        torch.backends.cudnn.benchmark = True
     if args.no_pretrained:
         cfg["pretrained"] = False
     seed_everything(cfg.get("seed", 42))
@@ -146,11 +149,15 @@ def main() -> None:
     if len(train_ds) == 0 or len(val_ds) == 0:
         raise SystemExit("empty train or val crop set - is the split built?")
 
+    workers = int(cfg.get("num_workers", 4))
     train_loader = DataLoader(train_ds, batch_size=cfg["batch_size"], shuffle=True,
-                              num_workers=cfg.get("num_workers", 4), pin_memory=device.type == "cuda",
+                              num_workers=workers, pin_memory=device.type == "cuda",
+                              persistent_workers=workers > 0,
+                              prefetch_factor=4 if workers > 0 else None,
                               drop_last=len(train_ds) > cfg["batch_size"])
     val_loader = DataLoader(val_ds, batch_size=cfg["batch_size"], shuffle=False,
-                            num_workers=cfg.get("num_workers", 4), pin_memory=device.type == "cuda")
+                            num_workers=workers, pin_memory=device.type == "cuda",
+                            persistent_workers=workers > 0)
 
     counts = count_train_classes(labels / "train")
     weights = class_weights(counts, NUM_CLASSES, power=cfg.get("weight_power", 1.0)).to(device)
