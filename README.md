@@ -1,11 +1,11 @@
 # UI Element Detector
 
 Semester project: detect UI elements in Android app screenshots (RICO) and compare CNN
-techniques: 5 classic architectures plus 5 newer ones (published 2022 or later). This
+techniques: five newer models (published 2022 or later) plus the YOLO detector. This
 file is updated after every completed step.
 
-**Status:** steps 0–5 done (code). Kaggle training is running; densenet121 and
-xception41 are already trained there.
+**Status:** steps 0–5 done (code). Kaggle training of the five newer classifiers is
+running/done; Phase 6 (testing) and Phase 7 (evaluation) come next.
 
 ---
 
@@ -18,10 +18,13 @@ Preprocessing  ->  Split 70:20:10  ->  Training  ->  Testing  ->  Evaluation
 Two stages:
 
 1. **Detection** — YOLO26n finds element boxes on the full screenshot.
-2. **Classification** — ten CNNs classify each detected crop into one of 15 classes:
-   5 classic families (DenseNet121, Xception41, SE-ResNet50, PyramidNet-110,
-   Residual Attention Network) and 5 newer families (ConvNeXt-Tiny, ConvNeXtV2-Tiny,
-   FastViT-SA12, EfficientViT-B1, RepViT-M1.5).
+2. **Classification** — five newer CNNs (2022+) classify each detected crop into one of
+   15 classes: ConvNeXt-Tiny, ConvNeXtV2-Tiny, FastViT-SA12, EfficientViT-B1, RepViT-M1.5.
+
+**Final comparison (locked in Oct 28 2026): these 5 classifiers + YOLO26n = 6 models.**
+The classic architectures (DenseNet121, Xception41, SE-ResNet50, PyramidNet-110,
+Residual Attention Network) stay in the repo as earlier work but are not part of the
+final evaluation tables.
 
 15 classes: Layout, Text, Image, Button, Toolbar, ProgressBar, List, WebView, Tab,
 Drawer, Ad, Card, ScrollView, Checkbox, ViewPager.
