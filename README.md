@@ -211,6 +211,36 @@ full pass over the 1.34 M training boxes. Expected on a T4: **~6-8 min per epoch
 Known limitation: Ultralytics has no per-class weights (only a scalar `cls_pw`), so
 class weighting applies to the classifier stage.
 
+### Step 6 — Training done on Kaggle, testing code + notebook
+
+The five newer classifiers and YOLO26n were trained on Kaggle (20 epochs, early stopping
+picked epochs 9-18). Val macro-F1 of the classifiers is 0.29-0.30 (overfitting under the
+reduced crop budget); YOLO26n reached precision ~0.57 / the training curve is in
+`results/yolo26n/results.csv`. The checkpoints came back as two zips and were extracted
+into `results/` (`scripts/testing/verify_checkpoints.py`: **5/5 load with strict key
+match**, yolo26n loads via Ultralytics).
+
+New Phase 6 code, all smoke-tested:
+
+* `scripts/testing/run_detector_on_test.py` — runs `yolo26n` on the **test split
+  (13,208 images)** and saves one YOLO-format prediction file per image
+  (`<class> <cx> <cy> <w> <h> <conf>`) plus `summary.csv`.
+* `scripts/testing/test_classifiers.py` — runs each classifier on test crops from two
+  sources: `--source gt` (ground-truth boxes → classifier quality alone, the primary
+  cross-model comparison) and `--source det` (the detector's boxes, matched to ground
+  truth by IoU >= 0.5 → end-to-end system quality; unmatched boxes get truth = -1).
+  Writes `<model>_<source>_test.csv` (one row per crop) plus a float16 probability
+  file (`.npz`) for the ROC curves of Phase 7. Works on CPU and GPU (`--device auto`).
+* `scripts/testing/run_all_tests.py` — resume-safe driver that chains everything.
+* `notebooks/kaggle_test.ipynb` — the same runs on a Kaggle T4 (~45-75 min instead of
+  ~14 h on this machine's 8 CPUs); auto-detects the data zip and the checkpoints from
+  the training notebook's saved output or a `ui-results*.zip`, verifies all 6
+  checkpoints load, runs detector + 5 classifiers on both sources, zips
+  `results/testing/` to `ui-testing.zip`.
+
+`results/testing/` is gitignored (the prediction dumps are ~500 MB); Phase 7 commits
+only the small metric summaries.
+
 ---
 
 ## How to run
@@ -235,6 +265,17 @@ python scripts/training/train_cnn.py --model densenet121 --epochs 1 --max-crops 
 4. The rest smoke-tests, trains the 5 classifiers, trains YOLO26n, and writes
    `ui-results.zip` to `/kaggle/working`.
 5. **Save Version**, then download `ui-results.zip` from the *Output* tab.
+
+**Testing (Phase 6, after training):**
+
+* Kaggle (recommended, ~45-75 min on a T4): open `notebooks/kaggle_test.ipynb`,
+  Accelerator = GPU T4 x2, Internet = On, *Add Input* → the `ui-data` dataset **and** the
+  training notebook's saved output (its *Output* must contain the checkpoints; a
+  `ui-results*.zip` added as a dataset also works). Run all cells; download
+  `ui-testing.zip` from the *Output* tab.
+* Local (CPU, ~13-14 h): `python scripts/testing/run_all_tests.py --sources gt det`.
+  Single pieces: `run_detector_on_test.py`, then `test_classifiers.py --model <m>
+  --source gt|det --device auto`.
 
 `/kaggle/working` is **temporary**: checkpoints in `/kaggle/working/saved` disappear when the
 session ends (12 h cap, or ~20 min idle). Keep them with either:

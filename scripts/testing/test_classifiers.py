@@ -135,11 +135,14 @@ def main() -> None:
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--max-images", type=int, default=0, help="0 = all")
     parser.add_argument("--threads", type=int, default=0)
+    parser.add_argument("--device", default="auto", help="auto | cpu | cuda")
     args = parser.parse_args()
 
     torch.set_grad_enabled(False)
     if args.threads:
         torch.set_num_threads(args.threads)
+    device = torch.device(args.device if args.device != "auto"
+                          else ("cuda" if torch.cuda.is_available() else "cpu"))
 
     ckpt_path = Path(args.weights or f"results/{args.model}/best.pt")
     blob = torch.load(ckpt_path, map_location="cpu", weights_only=True)
@@ -149,7 +152,9 @@ def main() -> None:
 
     model = build_model(args.model, num_classes=NUM_CLASSES, pretrained=False)
     model.load_state_dict(state, strict=True)
-    model.eval()
+    model.eval().to(device)
+    if device.type == "cuda":
+        torch.backends.cudnn.benchmark = True
 
     images_dir = PROJECT_ROOT / args.images
     out_csv = PROJECT_ROOT / "results/testing" / f"{args.model}_{args.source}_test.csv"
@@ -182,11 +187,11 @@ def main() -> None:
                      for m, b, t in zip(ds.meta, ds.boxes, ds.truth)]
 
     loader = DataLoader(ds, batch_size=args.batch_size, shuffle=False,
-                        num_workers=args.num_workers, pin_memory=False,
+                        num_workers=args.num_workers, pin_memory=device.type == "cuda",
                         persistent_workers=args.num_workers > 0)
 
     print(f"{args.model} | source={args.source} | {len(ds):,} crops | img {img_size} | "
-          f"batch {args.batch_size} | weights {ckpt_path}", flush=True)
+          f"batch {args.batch_size} | device {device} | weights {ckpt_path}", flush=True)
 
     n_pred = np.zeros(len(ds), dtype=np.int64)
     n_conf = np.zeros(len(ds), dtype=np.float32)
@@ -196,7 +201,7 @@ def main() -> None:
     t0 = time.perf_counter()
     done = 0
     for xb, idx in loader:
-        out = model(xb)
+        out = model(xb.to(device))
         p = torch.softmax(out, dim=1).numpy().astype(np.float16)
         idx = idx.numpy()
         probs[idx] = p
