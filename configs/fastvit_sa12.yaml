@@ -1,0 +1,15 @@
+﻿# FastViT-SA12 (Apple, 2023, RepMixPool) - 10.57 M params | timm: fastvit_sa12.apple_dist_in1k
+model: fastvit_sa12
+img_size: 128
+batch_size: 128
+epochs: 20
+lr: 0.0005
+weight_decay: 0.0005
+label_smoothing: 0.05
+patience: 6
+max_crops: 60000
+val_per_class: 500
+num_workers: 4
+pretrained: true
+weight_power: 1.0
+seed: 42

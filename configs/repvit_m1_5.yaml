@@ -1,0 +1,15 @@
+﻿# RepViT-M1.5 (2024, repVGG-style ViT) - 13.63 M params | timm: repvit_m1_5.dist_300e_in1k
+model: repvit_m1_5
+img_size: 128
+batch_size: 128
+epochs: 20
+lr: 0.0005
+weight_decay: 0.0005
+label_smoothing: 0.05
+patience: 6
+max_crops: 60000
+val_per_class: 500
+num_workers: 4
+pretrained: true
+weight_power: 1.0
+seed: 42

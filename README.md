@@ -1,9 +1,11 @@
 # UI Element Detector
 
-Semester project: detect UI elements in Android app screenshots (RICO) and compare six
-CNN techniques. This file is updated after every completed step.
+Semester project: detect UI elements in Android app screenshots (RICO) and compare CNN
+techniques: 5 classic architectures plus 5 newer ones (published 2022 or later). This
+file is updated after every completed step.
 
-**Status:** steps 0–5 done (code). Models not trained yet — training runs on Google Colab.
+**Status:** steps 0–5 done (code). Kaggle training is running; densenet121 and
+xception41 are already trained there.
 
 ---
 
@@ -16,7 +18,10 @@ Preprocessing  ->  Split 70:20:10  ->  Training  ->  Testing  ->  Evaluation
 Two stages:
 
 1. **Detection** — YOLO26n finds element boxes on the full screenshot.
-2. **Classification** — five CNNs classify each detected crop into one of 15 classes.
+2. **Classification** — ten CNNs classify each detected crop into one of 15 classes:
+   5 classic families (DenseNet121, Xception41, SE-ResNet50, PyramidNet-110,
+   Residual Attention Network) and 5 newer families (ConvNeXt-Tiny, ConvNeXtV2-Tiny,
+   FastViT-SA12, EfficientViT-B1, RepViT-M1.5).
 
 15 classes: Layout, Text, Image, Button, Toolbar, ProgressBar, List, WebView, Tab,
 Drawer, Ad, Card, ScrollView, Checkbox, ViewPager.
@@ -144,6 +149,21 @@ images containing that class (15 folders × 3 splits, no duplicated images).
 | PyramidNet-110 | 1.77 M | trained from scratch |
 | Residual Attention Network | 21.75 M | trained from scratch |
 | YOLO26n (detector) | 2.57 M | COCO |
+
+Added Oct 2026 at the user's request — newer families, all published 2022 or later,
+all timm models with ImageNet weights:
+
+| model | params | timm checkpoint |
+|---|---|---|
+| ConvNeXt-Tiny (2022) | 27.83 M | `convnext_tiny.fb_in22k_ft_in1k` |
+| ConvNeXtV2-Tiny (2023) | 27.88 M | `convnextv2_tiny.fcmae_ft_in1k` |
+| FastViT-SA12 (2023, Apple) | 10.57 M | `fastvit_sa12.apple_dist_in1k` |
+| EfficientViT-B1 (2023) | 7.53 M | `efficientvit_b1.r224_in1k` |
+| RepViT-M1.5 (2024) | 13.63 M | `repvit_m1_5.dist_300e_in1k` |
+
+All ten classifiers plus both YOLOs build and forward at 128 px (`check_models.py`,
+`failures: 0`). Every new model has its own `configs/<name>.yaml` (same protocol as the
+classic ones: 20 epochs, 60,000 crops/epoch, class-weighted loss, AdamW + cosine).
 
 PyramidNet and Residual Attention Network are reimplemented from their papers because
 no pretrained weights exist. Both are trained from scratch, so lower scores are
