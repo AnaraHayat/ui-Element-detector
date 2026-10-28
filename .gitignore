@@ -11,3 +11,7 @@ docs/
 
 runs/
 *.zip
+
+# Phase 6 prediction dumps (hundreds of MB of per-crop rows); Phase 7 writes the
+# small metric summaries that get committed.
+results/testing/

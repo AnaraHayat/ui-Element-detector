@@ -1,0 +1,14 @@
+batch_size: 128
+epochs: 20
+img_size: 128
+label_smoothing: 0.05
+lr: 0.0005
+max_crops: 60000
+model: convnextv2_tiny
+num_workers: 4
+patience: 6
+pretrained: true
+seed: 42
+val_per_class: 500
+weight_decay: 0.0005
+weight_power: 1.0
