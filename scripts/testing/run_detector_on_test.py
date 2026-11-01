@@ -25,6 +25,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
+def device_is_cuda(device: str) -> bool:
+    return str(device).startswith("cuda")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--weights", default="results/yolo26n/weights/best.pt")
@@ -32,7 +36,8 @@ def main() -> None:
     parser.add_argument("--out", default="results/testing/yolo26n")
     parser.add_argument("--imgsz", type=int, default=640)
     parser.add_argument("--conf", type=float, default=0.25)
-    parser.add_argument("--batch", type=int, default=16, help="images per GPU batch")
+    parser.add_argument("--batch", type=int, default=8,
+                        help="images per GPU batch (auto-halved on CUDA OOM)")
     parser.add_argument("--max-images", type=int, default=0,
                         help="process at most N not-yet-done images (0 = all)")
     parser.add_argument("--no-resume", action="store_true", help="redo every image")
@@ -61,32 +66,55 @@ def main() -> None:
     total_boxes, failed = 0, 0
     written = 0
     if todo:
-        model = YOLO(str(PROJECT_ROOT / args.weights))
-        try:
-            for r in model.predict(
-                    source=[str(p) for p in todo], imgsz=args.imgsz, conf=args.conf,
-                    batch=args.batch, device=args.device, stream=True, verbose=False):
-                stem = Path(r.path).stem
-                boxes = r.boxes
-                lines = []
-                if boxes is not None:
-                    for (cx, cy, w, h), c, p in zip(boxes.xywhn.tolist(), boxes.cls.tolist(),
-                                                    boxes.conf.tolist()):
-                        lines.append(f"{int(c)} {cx:.6f} {cy:.6f} {w:.6f} {h:.6f} {p:.4f}")
-                (labels_dir / f"{stem}.txt").write_text(
-                    "\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
-                total_boxes += len(lines)
-                written += 1
+        import gc
 
-                if written % 200 == 0:
-                    print(f"  {len(done) + written:,}/{len(all_images):,} images done",
-                          flush=True)
-        except Exception:  # noqa: BLE001 - show the real error, keep what was written
-            failed += 1
-            print("\nDETECTOR RUN FAILED - traceback:", flush=True)
-            traceback.print_exc()
-            print(f"\nprogress kept: {len(list(labels_dir.glob('*.txt'))):,} images. "
-                  f"Run the same command again to continue.", flush=True)
+        import torch
+
+        batch = args.batch
+        model = YOLO(str(PROJECT_ROOT / args.weights))
+        while todo and batch >= 1:
+            try:
+                if device_is_cuda(args.device):
+                    torch.cuda.empty_cache()
+                for r in model.predict(
+                        source=[str(p) for p in todo], imgsz=args.imgsz, conf=args.conf,
+                        batch=batch, device=args.device, stream=True, verbose=False):
+                    stem = Path(r.path).stem
+                    boxes = r.boxes
+                    lines = []
+                    if boxes is not None:
+                        for (cx, cy, w, h), c, p in zip(boxes.xywhn.tolist(),
+                                                        boxes.cls.tolist(),
+                                                        boxes.conf.tolist()):
+                            lines.append(f"{int(c)} {cx:.6f} {cy:.6f} {w:.6f} {h:.6f} {p:.4f}")
+                    (labels_dir / f"{stem}.txt").write_text(
+                        "\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+                    total_boxes += len(lines)
+                    written += 1
+
+                    if written % 200 == 0:
+                        print(f"  {len(done) + written:,}/{len(all_images):,} images done",
+                              flush=True)
+                break  # finished this chunk
+            except Exception as exc:  # noqa: BLE001
+                oom = "out of memory" in str(exc).lower() or \
+                    type(exc).__name__ == "OutOfMemoryError"
+                kept = len(list(labels_dir.glob("*.txt")))
+                if oom and batch > 1:
+                    batch = max(1, batch // 2)
+                    print(f"\nCUDA OOM - retrying with batch {batch} "
+                          f"({kept:,} images already saved)", flush=True)
+                    gc.collect()
+                    if device_is_cuda(args.device):
+                        torch.cuda.empty_cache()
+                    todo = [p for p in todo if not (labels_dir / f"{p.stem}.txt").exists()]
+                    continue
+                failed += 1
+                print("\nDETECTOR RUN FAILED - traceback:", flush=True)
+                traceback.print_exc()
+                print(f"\nprogress kept: {kept:,} images. "
+                      f"Run the same command again to continue.", flush=True)
+                break
 
     # summary always rebuilt from what is on disk (cheap, and correct after resumes)
     rows = []
