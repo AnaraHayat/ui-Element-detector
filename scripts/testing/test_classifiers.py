@@ -122,6 +122,20 @@ class DetectedCropDataset(Dataset):
         return self.tf(crop), index
 
 
+class IndexedCrops(Dataset):
+    """Wrap a CropDataset so __getitem__ returns (crop, row_index) instead of (crop, label)."""
+
+    def __init__(self, base: CropDataset):
+        self.base = base
+
+    def __len__(self) -> int:
+        return len(self.base)
+
+    def __getitem__(self, index: int):
+        x, _label = self.base[index]
+        return x, index
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
@@ -170,8 +184,9 @@ def main() -> None:
         ds = CropDataset(images_dir, labels_dir, img_size=img_size, train=False)
         if args.max_images:
             ds.samples = [s for s in ds.samples if (labels_dir / f"{s[0]}.txt") in allowed]
+        ds = IndexedCrops(ds)  # the loop needs (crop, row_index); CropDataset yields (crop, label)
         meta_rows = [{"image": s[0], "cx": s[2], "cy": s[3], "w": s[4], "h": s[5],
-                      "truth": s[1]} for s in ds.samples]
+                      "truth": s[1]} for s in ds.base.samples]
     else:
         det_dir = PROJECT_ROOT / args.det_labels
         if args.max_images:
