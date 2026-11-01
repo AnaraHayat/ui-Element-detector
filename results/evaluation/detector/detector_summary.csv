@@ -1,0 +1,2 @@
+mAP50,precision_macro@conf,recall_macro@conf,f1_macro@conf,conf_threshold,iou_threshold,images
+0.31356351967303414,0.5456599916285578,0.38074093967884287,0.4296578258102496,0.25,0.5,13208

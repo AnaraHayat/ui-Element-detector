@@ -241,6 +241,34 @@ New Phase 6 code, all smoke-tested:
 `results/testing/` is gitignored (the prediction dumps are ~500 MB); Phase 7 commits
 only the small metric summaries.
 
+### Step 7 — Evaluation (part 1: detector + end-to-end; GT tables pending)
+
+The Kaggle test results arrived as `ui-testing.zip` (69.9 MB): 10 prediction files
+(5 classifiers x 2 crop sources), 10 probability files, and YOLO26n predictions for all
+13,208 test images. Findings:
+
+* **Bug found and fixed** (`3debe39`): in GT mode `test_classifiers.py` used the class
+  label as a row index, so all 5 GT prediction files were garbage (only 15 rows had
+  values; the validity check in `evaluate_models.py` caught it). The det files were
+  healthy. The 5 GT runs are being redone.
+* **Detector (YOLO26n) on the test split** — `scripts/testing/evaluate_detector.py`
+  (greedy one-to-one matching, IoU 0.5): **mAP@0.5 = 0.314**, macro precision 0.546 /
+  recall 0.381 / F1 0.430 at conf 0.25; only **29.8% of the 383,955 GT boxes** are
+  matched at IoU 0.5 (Layout+Text+Image dominate but are hard); kappa over matched
+  pairs = 0.477. Best classes: Drawer (AP 0.737), Toolbar (0.636), List (0.535);
+  worst: ProgressBar (0.0), Checkbox (0.047). Top confusions: Layout<->List,
+  Layout<->Image, Layout<->Toolbar, Text->Layout.
+* **End-to-end (det crops)** via `evaluate_models.py` (user-provided, at project root):
+  the 5 classifiers on the detector's 150,891 matched crops — accuracy 0.174-0.205,
+  macro-F1 0.160-0.172, kappa 0.135-0.153, macro AUC 0.738-0.781. repvit_m1_5 has the
+  best accuracy (0.205), efficientvit_b1 the best macro-F1 (0.170); every pairwise
+  McNemar test is significant (Bonferroni p < 0.05). Low numbers are expected here:
+  half the GT boxes are never detected, and crops are misaligned detector boxes.
+
+Outputs: `results/evaluation/detector/`, `results/evaluation/det/`
+(per-class CSVs, confusion matrices + ROC PNGs, summary.csv, mcnemar.csv).
+The GT-crop tables (classifier quality alone) follow when the re-run finishes.
+
 ---
 
 ## How to run
